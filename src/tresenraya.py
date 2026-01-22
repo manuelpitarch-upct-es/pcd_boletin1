@@ -70,3 +70,52 @@ def test_no_ganador():
 def test_ganador():
     movimientos_jugador = {2:[1,2,3]}
     assert True == jugada_ganadora(movimientos_jugador)
+def mostrar_tablero(tablero):
+    for fila in tablero:
+        for celda in fila:
+            print(celda, end=' ')
+        print('\n')
+if __name__ == "__main__":
+    n = int(input('Introduce el tamaño del tablero cuadrado: '))
+    casillas_libres = n * n
+    jugador_activo = 0
+    movimientos_jugador_1 = {}
+    movimientos_jugador_2 = {}
+    movimientos_jugadores = [movimientos_jugador_1, movimientos_jugador_2]
+
+    while casillas_libres > 0:
+        tablero = generar_tablero(n, movimientos_jugadores)
+        mostrar_tablero(tablero)
+        
+        casilla_jugador = input(f"JUGADOR {jugador_activo+1}: Introduce movimiento (x,y): ")
+        casilla_jugador = casilla_jugador.strip()
+        
+        try:
+            x = int(casilla_jugador.split(',')[0]) - 1
+            y = int(casilla_jugador.split(',')[1]) - 1
+            
+            movimientos_jugador_activo = movimientos_jugadores[jugador_activo]
+            movimientos_otro_jugador = movimientos_jugadores[(jugador_activo+1)%2]
+
+            if movimiento_valido(x, y, movimientos_otro_jugador):
+                mov_col = movimientos_jugador_activo.get(x, [])
+                mov_col.append(y)
+                movimientos_jugador_activo[x] = mov_col
+
+                if jugada_ganadora(movimientos_jugador_activo):
+                    tablero = generar_tablero(n, movimientos_jugadores)
+                    mostrar_tablero(tablero)
+                    print(f"ENHORABUENA EL JUGADOR {jugador_activo+1} HA GANADO")
+                    break
+            else:
+                # Variables de sonido según pág. 16
+                frequency = 2000 
+                duration = 1000 
+                print('\a') # Beep
+                print("Movimiento invalido. Turno para el siguiente jugador")
+            
+            casillas_libres = casillas_libres - 1
+            jugador_activo = (jugador_activo + 1) % 2
+            
+        except (ValueError, IndexError):
+            print("Error: Introduce el formato correcto x,y (ejemplo: 1,2)")
